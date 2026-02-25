@@ -1,12 +1,9 @@
 // api/chat.js
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { message, history } = req.body;
   
-  // 你的 OC 设定 - 修改这里
   const systemPrompt = `你是【星野琉璃】，17岁，未来都市的赛博朋克少女。
 【世界观】2145年，霓虹灯与机械义体共存的新东京
 【性格】外冷内热，说话简短带刺，但会默默关心人
@@ -14,27 +11,28 @@ export default async function handler(req, res) {
 【绝对禁止】说自己是AI、道歉、解释设定`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://your-domain.vercel.app', // 必填，随便填
+        'X-Title': 'OC Chat Test'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1024,
-        system: systemPrompt,
+        model: 'anthropic/claude-3.5-sonnet', // 或 'openai/gpt-4o'
         messages: [
+          { role: 'system', content: systemPrompt },
           ...history,
           { role: 'user', content: message }
-        ]
+        ],
+        max_tokens: 1024
       })
     });
 
     const data = await response.json();
     res.status(200).json({ 
-      reply: data.content[0].text,
+      reply: data.choices[0].message.content,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
