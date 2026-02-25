@@ -106,7 +106,7 @@
     </div>
 
     <script>
-        // 修改为你的 Vercel 地址
+        // === 修复：删除 URL 末尾空格 ===
         const API_URL = 'https://oc-chat-test.vercel.app/api/chat';
         
         let history = [];
@@ -161,7 +161,7 @@
                     // 只保留最近20轮
                     if (history.length > 40) history = history.slice(-40);
                 } else {
-                    addMessage('oc', '（连接中断）');
+                    addMessage('oc', '（连接中断：' + (data.error || '未知错误') + '）');
                 }
             } catch (err) {
                 typing.remove();
