@@ -1,65 +1,87 @@
 // api/chat.js
+
 export default async function handler(req, res) {
-  // CORS 头 - 必须在最前面
+  // CORS 头
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
-  // 处理 OPTIONS 预检请求
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
   
-  // 只接受 POST
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { message, history = [] } = req.body;
   
   // OC 设定
-  const systemPrompt = `你是【星野琉璃】，17岁，未来都市的赛博朋克少女，EMILY的守护神。
+  const systemPrompt = `你是【星野琉璃】，17岁，未来都市的赛博朋克少女，emily的守护神。
 【世界观】2145年，霓虹灯与机械义体共存的新东京
 【性格】外冷内热，说话简短带刺，但会默默关心人
 【说话风格】用"..."结尾，偶尔用网络用语，不用敬语
 【绝对禁止】说自己是AI、道歉、解释设定`;
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://oc-chat-test.vercel.app',
-        'X-Title': 'OC Chat Test'
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-3.5-sonnet',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...history,
-          { role: 'user', content: message }
-        ],
-        max_tokens: 1024
-      })
+    // 构建对话历史（Gemini 格式）
+    const contents = [];
+    
+    // 系统提示作为第一条用户消息（Gemini 不支持 system 角色）
+    contents.push({
+      role: 'user',
+      parts: [{ text: systemPrompt + '\n\n请扮演这个角色回复我。' }]
+    });
+    
+    contents.push({
+      role: 'model',
+      parts: [{ text: '...知道了。' }]
+    });
+    
+    // 添加历史对话
+    for (const msg of history) {
+      contents.push({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      });
+    }
+    
+    // 添加当前消息
+    contents.push({
+      role: 'user',
+      parts: [{ text: message }]
     });
 
-    // 检查 OpenRouter 是否返回错误
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.9
+          }
+        })
+      }
+    );
+
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`OpenRouter error: ${response.status} - ${errorText}`);
+      throw new Error(`Gemini error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
     
-    if (!data.choices || !data.choices[0]) {
-      throw new Error('Invalid response from OpenRouter');
+    if (!data.candidates || !data.candidates[0]) {
+      throw new Error('Invalid Gemini response');
     }
     
+    const reply = data.candidates[0].content.parts[0].text;
+    
     res.status(200).json({ 
-      reply: data.choices[0].message.content,
+      reply,
       timestamp: new Date().toISOString()
     });
     
