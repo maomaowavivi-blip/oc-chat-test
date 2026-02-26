@@ -53,44 +53,22 @@ export default async function handler(req, res) {
     });
 
     // === 修复：删除 key= 后面的空格 ===
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            maxOutputTokens: 1024,
-            temperature: 0.9
-          }
-        })
-      }
-    );
+    const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.KIMI_API_KEY}`
+  },
+  body: JSON.stringify({
+    model: 'moonshot-v1-8k', // 或 moonshot-v1-32k
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...history,
+      { role: 'user', content: message }
+    ],
+    temperature: 0.7
+  })
+});
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.candidates || !data.candidates[0]) {
-      throw new Error('Invalid Gemini response');
-    }
-    
-    const reply = data.candidates[0].content.parts[0].text;
-    
-    res.status(200).json({ 
-      reply,
-      timestamp: new Date().toISOString()
-    });
-    
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ 
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-}
+const data = await response.json();
+const reply = data.choices[0].message.content;
