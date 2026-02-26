@@ -24,51 +24,46 @@ export default async function handler(req, res) {
 【绝对禁止】说自己是AI、道歉、解释设定`;
 
   try {
-    // 构建对话历史（Gemini 格式）
-    const contents = [];
-    
-    // 系统提示作为第一条用户消息（Gemini 不支持 system 角色）
-    contents.push({
-      role: 'user',
-      parts: [{ text: systemPrompt + '\n\n请扮演这个角色回复我。' }]
+    const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.KIMI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'moonshot-v1-8k',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...history,
+          { role: 'user', content: message }
+        ],
+        temperature: 0.7
+      })
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Kimi error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
     
-    contents.push({
-      role: 'model',
-      parts: [{ text: '...知道了。' }]
-    });
-    
-    // 添加历史对话
-    for (const msg of history) {
-      contents.push({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      });
+    if (!data.choices || !data.choices[0]) {
+      throw new Error('Invalid Kimi response');
     }
     
-    // 添加当前消息
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
+    const reply = data.choices[0].message.content;
+    
+    res.status(200).json({ 
+      reply,
+      timestamp: new Date().toISOString()
     });
-
-    // === 修复：删除 key= 后面的空格 ===
-    const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.KIMI_API_KEY}`
-  },
-  body: JSON.stringify({
-    model: 'moonshot-v1-8k', // 或 moonshot-v1-32k
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...history,
-      { role: 'user', content: message }
-    ],
-    temperature: 0.7
-  })
-});
-
-const data = await response.json();
-const reply = data.choices[0].message.content;
+    
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ 
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
