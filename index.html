@@ -1,573 +1,748 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星野琉璃 | 2145</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background: #0a0a0f;
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* 手机外框 */
-        .phone-frame {
-            width: 100%;
-            max-width: 414px;
-            height: 100vh;
-            max-height: 896px;
-            background: #1a1a24;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(233, 69, 96, 0.3);
-        }
-        
-        @media (min-width: 415px) {
-            .phone-frame {
-                height: 90vh;
-                border-radius: 40px;
-                border: 8px solid #2a2a35;
-            }
-        }
-        
-        /* 状态栏 */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .status-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .rec-dot {
-            width: 8px;
-            height: 8px;
-            background: #e94560;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .status-right {
-            text-align: right;
-        }
-        
-        .time {
-            font-size: 24px;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-        
-        .date {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-        }
-        
-        /* 左侧图标栏 */
-        .side-icons {
-            position: absolute;
-            left: 15px;
-            top: 80px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 50;
-        }
-        
-        .icon-btn {
-            width: 44px;
-            height: 44px;
-            background: rgba(233, 69, 96, 0.15);
-            border: 1px solid rgba(233, 69, 96, 0.3);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .icon-btn:hover, .icon-btn.active {
-            background: rgba(233, 69, 96, 0.4);
-            border-color: #e94560;
-            transform: scale(1.05);
-        }
-        
-        /* 主内容区 */
-        .main-content {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        /* 角色展示区 */
-        .character-display {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 20px 20px;
-            position: relative;
-        }
-        
-        /* 背景装饰 */
-        .bg-decoration {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0.1;
-            background: 
-                radial-gradient(circle at 20% 80%, #e94560 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, #16213e 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        /* 角色立绘容器 */
-        .character-frame {
-            width: 280px;
-            height: 380px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            border: 2px solid rgba(233, 69, 96, 0.3);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        
-        /* 角色占位（可用图片替换） */
-        .character-image {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 120px;
-            background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%);
-            position: relative;
-        }
-        
-        .character-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, transparent 60%, rgba(233, 69, 96, 0.1) 100%);
-        }
-        
-        /* 角色信息 */
-        .character-info {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .character-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e94560;
-            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
-            letter-spacing: 4px;
-        }
-        
-        .character-title {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-            letter-spacing: 2px;
-        }
-        
-        /* 对话区域 */
-        .chat-section {
-            background: linear-gradient(180deg, transparent 0%, rgba(26,26,36,0.95) 20%);
-            padding: 20px;
-            position: relative;
-        }
-        
-        /* 对话气泡 */
-        .dialogue-box {
-            background: rgba(22, 33, 62, 0.9);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 15px;
-            min-height: 60px;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-        
-        .dialogue-box::before {
-            content: '...';
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            color: #e94560;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .dialogue-text {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #eee;
-        }
-        
-        .dialogue-text.typing::after {
-            content: '|';
-            animation: blink 1s infinite;
-            color: #e94560;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
-        /* 输入区域（音乐播放器风格） */
-        .input-section {
-            background: rgba(15, 15, 26, 0.95);
-            border-top: 1px solid rgba(233, 69, 96, 0.2);
-            padding: 20px;
-        }
-        
-        .player-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            padding: 15px;
-            border: 1px solid rgba(233, 69, 96, 0.2);
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        
-        .input-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .input-field {
-            flex: 1;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            border-radius: 25px;
-            padding: 12px 20px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        
-        .input-field:focus {
-            border-color: #e94560;
-            box-shadow: 0 0 10px rgba(233, 69, 96, 0.2);
-        }
-        
-        .input-field::placeholder {
-            color: #666;
-        }
-        
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
-            border: none;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        }
-        
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
-        }
-        
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* 底部装饰线 */
-        .bottom-line {
-            height: 5px;
-            background: linear-gradient(90deg, transparent, #e94560, transparent);
-            margin-top: 10px;
-            opacity: 0.5;
-        }
-        
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(233, 69, 96, 0.3);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(233, 69, 96, 0.5);
-        }
-    </style>
-</head>
-<body>
-    <div class="phone-frame">
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <div class="status-left">
-                <div class="rec-dot"></div>
-                <span>REC</span>
-            </div>
-            <div class="status-right">
-                <div class="time" id="clock">09:04</div>
-                <div class="date">WEDNESDAY</div>
-            </div>
-        </div>
-        
-        <!-- 左侧图标栏 -->
-        <div class="side-icons">
-            <div class="icon-btn active" title="对话">💬</div>
-            <div class="icon-btn" title="档案">📋</div>
-            <div class="icon-btn" title="音乐">🎵</div>
-            <div class="icon-btn" title="设置">⚙️</div>
-        </div>
-        
-        <!-- 主内容 -->
-        <div class="main-content">
-            <div class="bg-decoration"></div>
-            
-            <!-- 角色展示 -->
-            <div class="character-display">
-                <div class="character-frame">
-                    <div class="character-image">
-                        🤖
-                    </div>
-                </div>
-                <div class="character-info">
-                    <div class="character-name">星野琉璃</div>
-                    <div class="character-title">2145 · 新东京 · 赛博朋克少女</div>
-                </div>
-            </div>
-            
-            <!-- 对话区域 -->
-            <div class="chat-section">
-                <div class="dialogue-box" id="dialogueBox">
-                    <div class="dialogue-text" id="dialogueText">
-                        ...你是谁？怎么突然出现在我的频道里。
-                    </div>
-                </div>
-                
-                <!-- 输入区域（播放器风格） -->
-                <div class="input-section">
-                    <div class="player-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressBar"></div>
-                        </div>
-                        <div class="input-controls">
-                            <input 
-                                type="text" 
-                                class="input-field" 
-                                id="inputField"
-                                placeholder="输入消息..." 
-                                onkeypress="if(event.key==='Enter')sendMessage()"
-                            >
-                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                                ▶
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bottom-line"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OC LAB - 登录</title>
+  <style>
+    :root{
+      --bg1:#050714;
+      --bg2:#0B1020;
+      --text:#EAF0FF;
+      --muted:#9AA7C7;
+      --line: rgba(255,255,255,.10);
+      --glass: rgba(255,255,255,.06);
+      --shadow: rgba(0,0,0,.45);
+      --brand:#7C5CFF;     /* 紫 */
+      --brand2:#00D1FF;    /* 青 */
+      --accent:#FF4FD8;    /* 粉 */
+      --danger:#FF5A7A;
+      --ok:#4DFFB5;
+      --radius:16px;
+    }
 
-    <script>
-        // API 配置
-        const API_URL = 'https://oc-chat-test.vercel.app/api/chat';
-        
-        // 状态
-        let history = [];
-        let isTyping = false;
-        
-        // 时钟更新
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(124,92,255,.22), transparent 55%),
+                  radial-gradient(1200px 800px at 90% 20%, rgba(0,209,255,.18), transparent 60%),
+                  radial-gradient(900px 600px at 70% 85%, rgba(255,79,216,.12), transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+
+    /* subtle grid + noise-ish overlay */
+    .overlay{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 56px 56px,
+        linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 56px 56px;
+      mask-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,.85), transparent 70%);
+      opacity:.55;
+    }
+
+    .particles{
+      position:fixed; inset:-60px;
+      pointer-events:none;
+      filter: blur(0.2px);
+      opacity:.75;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .shell{
+      width:min(1060px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    @media (max-width: 900px){
+      .shell{ grid-template-columns: 1fr; }
+      .hero{ display:none; }
+    }
+
+    .hero{
+      border-radius: var(--radius);
+      padding:28px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(800px 500px at 25% 20%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(700px 450px at 80% 35%, rgba(0,209,255,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: 0 18px 60px var(--shadow);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:18px;
+    }
+
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(0,209,255,1));
+      box-shadow: 0 14px 30px rgba(124,92,255,.22);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius:10px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .brand h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.5px;
+    }
+    .brand .sub{
+      margin:2px 0 0 0;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .hero h2{
+      margin:14px 0 8px 0;
+      font-size:34px;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:0;
+      color: rgba(234,240,255,.78);
+      max-width: 38ch;
+      line-height:1.6;
+    }
+
+    .chips{
+      margin-top:18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,240,255,.86);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero .art{
+      position:absolute;
+      right:-30px;
+      bottom:-30px;
+      width:320px;
+      height:320px;
+      border-radius: 80px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,79,216,.35), transparent 55%),
+        radial-gradient(circle at 70% 40%, rgba(0,209,255,.35), transparent 55%),
+        radial-gradient(circle at 50% 75%, rgba(124,92,255,.40), transparent 60%);
+      filter: blur(0.2px);
+      opacity:.9;
+      transform: rotate(18deg);
+    }
+
+    /* Auth card */
+    .card{
+      border-radius: var(--radius);
+      padding:22px;
+      border:1px solid rgba(255,255,255,.10);
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: calc(var(--radius) + 2px);
+      background: linear-gradient(135deg, rgba(124,92,255,.45), rgba(0,209,255,.25), rgba(255,79,216,.22));
+      opacity:.35;
+      filter: blur(18px);
+      z-index:0;
+    }
+    .card > *{ position:relative; z-index:1; }
+
+    .cardHeader{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .cardHeader h3{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .cardHeader .hint{
+      margin-top:4px;
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.4;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin: 14px 0 16px 0;
+      padding:6px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .tab{
+      flex:1;
+      cursor:pointer;
+      border:none;
+      background: transparent;
+      color: rgba(234,240,255,.78);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-size:13px;
+      transition: .2s ease;
+    }
+    .tab.active{
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,209,255,.18));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .field{
+      margin: 12px 0;
+    }
+    .labelRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+    }
+    label{
+      font-size:12px;
+      color: rgba(234,240,255,.78);
+    }
+    .helpLink{
+      font-size:12px;
+      color: rgba(0,209,255,.85);
+      text-decoration:none;
+    }
+    .helpLink:hover{ text-decoration:underline; }
+
+    .inputWrap{
+      position:relative;
+    }
+    input{
+      width:100%;
+      padding:14px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+      transition: .2s ease;
+      font-size:14px;
+    }
+    input::placeholder{ color: rgba(154,167,199,.72); }
+    input:focus{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.14);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .row .grow{ flex:1; }
+
+    .btn{
+      cursor:pointer;
+      border:none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size:14px;
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .btnPrimary{
+      width:100%;
+      margin-top: 10px;
+      padding: 13px 14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(0,209,255,1));
+      border: none;
+      box-shadow: 0 16px 36px rgba(124,92,255,.22);
+    }
+    .btnPrimary:hover{
+      box-shadow: 0 20px 46px rgba(124,92,255,.28);
+    }
+
+    .meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin: 10px 0 6px 0;
+    }
+    .check{
+      display:flex; align-items:center; gap:8px;
+      font-size:12px;
+      color: rgba(234,240,255,.78);
+      user-select:none;
+    }
+    .check input{ width:auto; margin:0; }
+
+    .fineprint a{
+      color: rgba(0,209,255,.85);
+      text-decoration:none;
+    }
+    .fineprint a:hover{ text-decoration:underline; }
+
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin: 14px 0;
+      color: rgba(154,167,199,.75);
+      font-size:12px;
+    }
+    .divider:before, .divider:after{
+      content:"";
+      height:1px;
+      flex:1;
+      background: rgba(255,255,255,.10);
+    }
+
+    .social{
+      display:flex; gap:10px;
+    }
+    .social .btn{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      padding: 11px 12px;
+      font-size:13px;
+    }
+
+    .msg{
+      margin-top:10px;
+      font-size:12px;
+      line-height:1.5;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      display:none;
+    }
+    .msg.show{ display:block; }
+    .msg.error{
+      border-color: rgba(255,90,122,.35);
+      box-shadow: 0 0 0 4px rgba(255,90,122,.12);
+    }
+    .msg.ok{
+      border-color: rgba(77,255,181,.30);
+      box-shadow: 0 0 0 4px rgba(77,255,181,.10);
+    }
+
+    .footer{
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      color: rgba(154,167,199,.78);
+    }
+    .footer a{
+      color: rgba(234,240,255,.78);
+      text-decoration:none;
+    }
+    .footer a:hover{ text-decoration:underline; }
+
+    /* tiny icon */
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: rgba(0,209,255,.95);
+      box-shadow: 0 0 18px rgba(0,209,255,.55);
+      display:inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+  <canvas class="particles" id="particles"></canvas>
+
+  <div class="wrap">
+    <div class="shell">
+      <section class="hero">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>OC LAB</h1>
+            <div class="sub">你的 OC 智能体 · 认养 · 养成 · 对话</div>
+          </div>
+        </div>
+
+        <h2>把你的 OC<br/>变成会陪你说话的智能体</h2>
+        <p>登录后即可进入认养商城，选择形象与性格，创建你的专属 OC，并在「我的 OC」里管理与成长。</p>
+
+        <div class="chips" aria-hidden="true">
+          <span class="chip">角色卡牌化</span>
+          <span class="chip">稀有度/皮肤</span>
+          <span class="chip">养成数值</span>
+          <span class="chip">记忆与羁绊</span>
+          <span class="chip">按需付费</span>
+        </div>
+
+        <div class="art" aria-hidden="true"></div>
+      </section>
+
+      <main class="card" role="main">
+        <div class="cardHeader">
+          <div>
+            <h3><span class="dot"></span> 登录</h3>
+            <div class="hint">选择登录方式进入 OC 世界（演示页面，无真实发送）</div>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="登录方式切换">
+          <button class="tab active" id="tabPwd" role="tab" aria-selected="true">密码登录</button>
+          <button class="tab" id="tabCode" role="tab" aria-selected="false">验证码登录</button>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <div class="labelRow">
+              <label for="account">手机号 / 邮箱</label>
+              <a class="helpLink" href="javascript:void(0)" id="fillDemo">一键填入演示账号</a>
+            </div>
+            <div class="inputWrap">
+              <input id="account" name="account" placeholder="例如：13800000000 或 name@example.com" autocomplete="username"/>
+            </div>
+          </div>
+
+          <!-- 密码登录区 -->
+          <div id="panelPwd">
+            <div class="field">
+              <div class="labelRow">
+                <label for="password">密码</label>
+                <a class="helpLink" href="javascript:void(0)">忘记密码</a>
+              </div>
+              <div class="inputWrap">
+                <input id="password" name="password" type="password" placeholder="请输入密码" autocomplete="current-password"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- 验证码登录区 -->
+          <div id="panelCode" style="display:none;">
+            <div class="field">
+              <div class="labelRow">
+                <label for="code">验证码</label>
+                <span style="font-size:12px;color:rgba(154,167,199,.78);">6 位数字</span>
+              </div>
+
+              <div class="row">
+                <div class="grow">
+                  <input id="code" name="code" inputmode="numeric" placeholder="请输入验证码" maxlength="6"/>
+                </div>
+                <button type="button" class="btn" id="btnSend">发送验证码</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="meta">
+            <label class="check">
+              <input type="checkbox" id="agree"/>
+              <span class="fineprint">我已阅读并同意 <a href="javascript:void(0)">用户协议</a> 与 <a href="javascript:void(0)">隐私政策</a></span>
+            </label>
+          </div>
+
+          <button class="btn btnPrimary" type="submit" id="btnLogin">登录并进入</button>
+
+          <div class="msg" id="msgBox"></div>
+
+          <div class="divider">或使用第三方登录</div>
+
+          <div class="social">
+            <button type="button" class="btn" aria-label="微信登录（占位）">微信</button>
+            <button type="button" class="btn" aria-label="Google 登录（占位）">Google</button>
+            <button type="button" class="btn" aria-label="Apple 登录（占位）">Apple</button>
+          </div>
+
+          <div class="footer">
+            <span>没有账号？<a href="javascript:void(0)">去注册</a></span>
+            <span style="opacity:.8;">© OC LAB</span>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ===== 粒子背景（轻量）=====
+    (function(){
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let w, h, dpr;
+      const dots = [];
+      const DOTS = 60;
+
+      function resize(){
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        w = canvas.width = Math.floor(window.innerWidth * dpr);
+        h = canvas.height = Math.floor(window.innerHeight * dpr);
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.scale(dpr, dpr);
+      }
+
+      function rand(min, max){ return Math.random() * (max - min) + min; }
+
+      function init(){
+        dots.length = 0;
+        for(let i=0;i<DOTS;i++){
+          dots.push({
+            x: rand(0, window.innerWidth),
+            y: rand(0, window.innerHeight),
+            r: rand(0.8, 2.2),
+            vx: rand(-0.25, 0.25),
+            vy: rand(-0.18, 0.18),
+            a: rand(0.15, 0.55)
+          });
         }
-        setInterval(updateClock, 1000);
-        updateClock();
-        
-        // 添加消息到对话框
-        function showMessage(text, isUser = false) {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.textContent = text;
-            dialogueText.classList.remove('typing');
-            
-            // 添加动画效果
-            dialogueText.style.opacity = '0';
-            setTimeout(() => {
-                dialogueText.style.transition = 'opacity 0.3s ease';
-                dialogueText.style.opacity = '1';
-            }, 50);
-        }
-        
-        // 显示输入中
-        function showTyping() {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.textContent = '...';
-            dialogueText.classList.add('typing');
-        }
-        
-        // 更新进度条
-        function setProgress(percent) {
-            document.getElementById('progressBar').style.width = percent + '%';
-        }
-        
-        // 发送消息
-        async function sendMessage() {
-            const input = document.getElementById('inputField');
-            const btn = document.getElementById('sendBtn');
-            const text = input.value.trim();
-            
-            if (!text || isTyping) return;
-            
-            // 显示用户消息
-            showMessage(text, true);
-            input.value = '';
-            btn.disabled = true;
-            isTyping = true;
-            setProgress(30);
-            
-            // 延迟显示输入中
-            setTimeout(() => {
-                showTyping();
-                setProgress(60);
-            }, 300);
-            
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: text, 
-                        history 
-                    })
-                });
-                
-                setProgress(80);
-                const data = await res.json();
-                setProgress(100);
-                
-                if (data.reply) {
-                    // 模拟打字效果
-                    await typeWriter(data.reply);
-                    
-                    // 更新历史
-                    history.push(
-                        { role: 'user', content: text },
-                        { role: 'assistant', content: data.reply }
-                    );
-                    
-                    // 只保留最近20轮
-                    if (history.length > 40) {
-                        history = history.slice(-40);
-                    }
-                } else {
-                    showMessage('...连接中断。');
-                }
-            } catch (err) {
-                showMessage('...错误：' + err.message);
+      }
+
+      function draw(){
+        ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+
+        // 轻微渐隐层
+        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+        for(const p of dots){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -20) p.x = window.innerWidth + 20;
+          if(p.x > window.innerWidth + 20) p.x = -20;
+          if(p.y < -20) p.y = window.innerHeight + 20;
+          if(p.y > window.innerHeight + 20) p.y = -20;
+
+          // 点
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(124,92,255,${p.a})`;
+          ctx.fill();
+
+          // 轻连线
+          for(const q of dots){
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist > 0 && dist < 120){
+              ctx.strokeStyle = `rgba(0,209,255,${(1 - dist/120) * 0.08})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.stroke();
             }
-            
-            isTyping = false;
-            btn.disabled = false;
-            setTimeout(() => setProgress(0), 500);
+          }
         }
-        
-        // 打字机效果
-        async function typeWriter(text) {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.classList.remove('typing');
-            dialogueText.textContent = '';
-            
-            for (let i = 0; i < text.length; i++) {
-                dialogueText.textContent += text[i];
-                await new Promise(r => setTimeout(r, 30));
-            }
+        requestAnimationFrame(draw);
+      }
+
+      // init
+      resize();
+      init();
+      draw();
+
+      window.addEventListener('resize', () => {
+        ctx.setTransform(1,0,0,1,0,0);
+        resize();
+        init();
+      });
+    })();
+
+    // ===== 登录逻辑（演示）=====
+    const tabPwd = document.getElementById('tabPwd');
+    const tabCode = document.getElementById('tabCode');
+    const panelPwd = document.getElementById('panelPwd');
+    const panelCode = document.getElementById('panelCode');
+
+    const accountEl = document.getElementById('account');
+    const passwordEl = document.getElementById('password');
+    const codeEl = document.getElementById('code');
+    const agreeEl = document.getElementById('agree');
+
+    const form = document.getElementById('loginForm');
+    const msgBox = document.getElementById('msgBox');
+    const btnSend = document.getElementById('btnSend');
+    const fillDemo = document.getElementById('fillDemo');
+
+    let mode = 'pwd'; // 'pwd' | 'code'
+    let sending = false;
+    let countdown = 0;
+    let timer = null;
+
+    function setMode(next){
+      mode = next;
+      const isPwd = mode === 'pwd';
+      tabPwd.classList.toggle('active', isPwd);
+      tabCode.classList.toggle('active', !isPwd);
+      tabPwd.setAttribute('aria-selected', String(isPwd));
+      tabCode.setAttribute('aria-selected', String(!isPwd));
+      panelPwd.style.display = isPwd ? '' : 'none';
+      panelCode.style.display = isPwd ? 'none' : '';
+      clearMsg();
+    }
+
+    function showMsg(text, type){
+      msgBox.textContent = text;
+      msgBox.className = 'msg show ' + (type || '');
+    }
+    function clearMsg(){
+      msgBox.textContent = '';
+      msgBox.className = 'msg';
+    }
+
+    tabPwd.addEventListener('click', () => setMode('pwd'));
+    tabCode.addEventListener('click', () => setMode('code'));
+
+    fillDemo.addEventListener('click', () => {
+      accountEl.value = 'name@example.com';
+      passwordEl.value = '123456';
+      codeEl.value = '888888';
+      showMsg('已填入演示信息（仅演示，不会真实登录）。', 'ok');
+    });
+
+    function validateAccount(v){
+      const s = (v || '').trim();
+      if(!s) return false;
+      const isPhone = /^1\d{10}$/.test(s);
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+      return isPhone || isEmail;
+    }
+
+    function startCountdown(sec){
+      countdown = sec;
+      btnSend.disabled = true;
+      btnSend.textContent = `已发送 (${countdown}s)`;
+      timer = setInterval(() => {
+        countdown--;
+        if(countdown <= 0){
+          clearInterval(timer);
+          timer = null;
+          btnSend.disabled = false;
+          btnSend.textContent = '发送验证码';
+        }else{
+          btnSend.textContent = `已发送 (${countdown}s)`;
         }
-        
-        // 开场白动画
-        window.onload = () => {
-            const opening = "...你是谁？怎么突然出现在我的频道里。";
-            document.getElementById('dialogueText').textContent = '';
-            setTimeout(() => typeWriter(opening), 500);
-        };
-    </script>
+      }, 1000);
+    }
+
+    btnSend.addEventListener('click', () => {
+      clearMsg();
+      if(sending) return;
+
+      const acc = accountEl.value.trim();
+      if(!validateAccount(acc)){
+        showMsg('请输入正确的手机号或邮箱后再发送验证码。', 'error');
+        accountEl.focus();
+        return;
+      }
+
+      // 演示：模拟发送
+      sending = true;
+      btnSend.disabled = true;
+      btnSend.textContent = '发送中...';
+
+      setTimeout(() => {
+        sending = false;
+        showMsg('验证码已发送（演示：固定为 888888）。', 'ok');
+        startCountdown(60);
+      }, 600);
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearMsg();
+
+      const acc = accountEl.value.trim();
+      if(!validateAccount(acc)){
+        showMsg('账号格式不正确：请输入手机号(11位)或邮箱。', 'error');
+        accountEl.focus();
+        return;
+      }
+
+      if(!agreeEl.checked){
+        showMsg('请先勾选同意《用户协议》和《隐私政策》。', 'error');
+        agreeEl.focus();
+        return;
+      }
+
+      if(mode === 'pwd'){
+        const pwd = passwordEl.value;
+        if(!pwd || pwd.length < 6){
+          showMsg('密码至少 6 位。', 'error');
+          passwordEl.focus();
+          return;
+        }
+        // 演示：登录成功
+        showMsg('登录成功（演示）。下一步可跳转：认养商城页面。', 'ok');
+        // 你后续可以把这里改成：window.location.href = './market.html';
+      }else{
+        const code = codeEl.value.trim();
+        if(!/^\d{6}$/.test(code)){
+          showMsg('验证码必须是 6 位数字。', 'error');
+          codeEl.focus();
+          return;
+        }
+        if(code !== '888888'){
+          showMsg('验证码错误（演示：请输入 888888）。', 'error');
+          codeEl.focus();
+          return;
+        }
+        showMsg('登录成功（演示）。下一步可跳转：我的 OC 列表页。', 'ok');
+        // 你后续可以把这里改成：window.location.href = './my-ocs.html';
+      }
+    });
+  </script>
 </body>
 </html>
