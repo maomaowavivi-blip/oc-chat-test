@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OC LAB - 认养商城</title>
+  <style>
+    :root{
+      --bg1:#050714;
+      --bg2:#0B1020;
+      --text:#EAF0FF;
+      --muted:#9AA7C7;
+      --line: rgba(255,255,255,.10);
+      --glass: rgba(255,255,255,.06);
+      --shadow: rgba(0,0,0,.45);
+      --brand:#7C5CFF;     /* 紫 */
+      --brand2:#00D1FF;    /* 青 */
+      --accent:#FF4FD8;    /* 粉 */
+      --danger:#FF5A7A;
+      --ok:#4DFFB5;
+      --radius:16px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(124,92,255,.22), transparent 55%),
+                  radial-gradient(1200px 800px at 90% 20%, rgba(0,209,255,.18), transparent 60%),
+                  radial-gradient(900px 600px at 70% 85%, rgba(255,79,216,.12), transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .overlay{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 56px 56px,
+        linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 56px 56px;
+      mask-image: radial-gradient(circle at 50% 40%, rgba(0,0,0,.85), transparent 70%);
+      opacity:.55;
+      z-index:0;
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      min-height:100%;
+      padding:18px 18px 30px;
+      max-width: 1160px;
+      margin:0 auto;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px var(--shadow);
+      position:sticky;
+      top:12px;
+      z-index:5;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 240px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(0,209,255,1));
+      box-shadow: 0 14px 30px rgba(124,92,255,.20);
+      position:relative;
+      flex:0 0 auto;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius:10px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .brandTitle{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .brandTitle .name{
+      font-weight:700;
+      letter-spacing:.5px;
+      font-size:14px;
+      line-height:1.1;
+    }
+    .brandTitle .sub{
+      font-size:12px;
+      color: rgba(154,167,199,.85);
+      line-height:1.2;
+    }
+
+    .nav{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      cursor:pointer;
+      border:none;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size:12px;
+      color: rgba(234,240,255,.86);
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .pill.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,209,255,.18));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+      color: var(--text);
+    }
+
+    .btn{
+      cursor:pointer;
+      border:none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size:13px;
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(0,209,255,1));
+      border:none;
+      box-shadow: 0 16px 36px rgba(124,92,255,.18);
+    }
+
+    /* Header area */
+    .header{
+      margin-top: 18px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .header h1{
+      margin:0;
+      font-size: 26px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .header p{
+      margin:8px 0 0 0;
+      color: rgba(234,240,255,.78);
+      line-height:1.6;
+      max-width: 62ch;
+      font-size: 13px;
+    }
+
+    .balance{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+    }
+    .balance .k{
+      font-size:12px;
+      color: rgba(154,167,199,.85);
+    }
+    .balance .v{
+      font-weight:700;
+      letter-spacing:.3px;
+    }
+    .balance .tag{
+      font-size:12px;
+      padding:6px 8px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,240,255,.86);
+    }
+
+    /* Filters */
+    .filters{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr .8fr;
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .filters{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px){
+      .filters{ grid-template-columns: 1fr; }
+    }
+
+    .field{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .field label{
+      font-size:12px;
+      color: rgba(154,167,199,.88);
+      white-space:nowrap;
+    }
+    .field input, .field select{
+      width:100%;
+      border:none;
+      outline:none;
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      padding: 10px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      font-size:13px;
+    }
+    .field input::placeholder{ color: rgba(154,167,199,.72); }
+
+    /* Grid */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 820px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px var(--shadow);
+      overflow:hidden;
+      position:relative;
+      transition: transform .15s ease, box-shadow .2s ease;
+      cursor:pointer;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+
+    .thumb{
+      height: 132px;
+      position:relative;
+      background:
+        radial-gradient(140px 110px at 25% 35%, rgba(255,79,216,.28), transparent 60%),
+        radial-gradient(160px 120px at 75% 30%, rgba(0,209,255,.22), transparent 60%),
+        radial-gradient(240px 160px at 55% 80%, rgba(124,92,255,.30), transparent 65%),
+        linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.35));
+    }
+    .avatar{
+      position:absolute;
+      left: 14px;
+      bottom: -22px;
+      width: 66px;
+      height: 66px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 16px 36px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    .badge{
+      position:absolute;
+      right: 12px;
+      top: 12px;
+      font-size:12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      color: rgba(234,240,255,.92);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:99px;
+      display:inline-block;
+      box-shadow: 0 0 18px rgba(255,255,255,.22);
+    }
+
+    .body{
+      padding: 34px 14px 14px;
+    }
+    .nameRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .title{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+      line-height:1.25;
+    }
+    .rarity{
+      font-size:12px;
+      padding:6px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,240,255,.86);
+      white-space:nowrap;
+    }
+    .desc{
+      margin:8px 0 0 0;
+      font-size:12px;
+      color: rgba(154,167,199,.92);
+      line-height:1.5;
+      min-height: 36px;
+    }
+
+    .metaRow{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .tags{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .t{
+      font-size:11px;
+      padding:6px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,240,255,.84);
+    }
+    .price{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+    .price .num{
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .price .unit{
+      font-size:12px;
+      color: rgba(154,167,199,.9);
+    }
+
+    /* Modal */
+    .modalMask{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      z-index: 50;
+    }
+    .modalMask.show{ display:flex; }
+
+    .modal{
+      width: min(980px, 100%);
+      border-radius: 20px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 22px 70px rgba(0,0,0,.60);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .modalTop{
+      display:flex;
+      gap:14px;
+      padding: 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+    .modalArt{
+      flex: 1.1;
+      min-height: 220px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(200px 150px at 25% 35%, rgba(255,79,216,.28), transparent 60%),
+        radial-gradient(240px 180px at 75% 30%, rgba(0,209,255,.22), transparent 60%),
+        radial-gradient(320px 220px at 55% 85%, rgba(124,92,255,.30), transparent 65%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.35));
+      position:relative;
+      overflow:hidden;
+    }
+    .modalArt .bigAvatar{
+      position:absolute;
+      left: 16px;
+      bottom: 16px;
+      width: 88px;
+      height: 88px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      letter-spacing:.6px;
+      box-shadow: 0 16px 36px rgba(0,0,0,.35);
+    }
+
+    .modalInfo{
+      flex: .9;
+      min-width: 280px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .modalInfo h2{
+      margin:0;
+      font-size: 20px;
+      line-height:1.2;
+    }
+    .modalInfo .small{
+      color: rgba(154,167,199,.92);
+      font-size: 12px;
+      line-height:1.6;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 90px 1fr;
+      gap:8px;
+      align-items:center;
+      font-size:12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .kv .k{
+      color: rgba(154,167,199,.9);
+    }
+    .kv .v{
+      color: rgba(234,240,255,.92);
+      font-weight: 600;
+    }
+
+    .modalBottom{
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .close{
+      cursor:pointer;
+      border:none;
+      background: transparent;
+      color: rgba(234,240,255,.82);
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .close:hover{
+      background: rgba(255,255,255,.08);
+      transform: translateY(-1px);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .msg{
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      font-size: 12px;
+      color: rgba(234,240,255,.90);
+      display:none;
+    }
+    .msg.show{ display:block; }
+    .msg.ok{
+      border-color: rgba(77,255,181,.30);
+      box-shadow: 0 0 0 4px rgba(77,255,181,.10);
+    }
+    .msg.error{
+      border-color: rgba(255,90,122,.35);
+      box-shadow: 0 0 0 4px rgba(255,90,122,.12);
+    }
+
+    .footer{
+      margin-top: 18px;
+      color: rgba(154,167,199,.78);
+      font-size: 12px;
+      text-align:center;
+    }
+    .footer a{ color: rgba(0,209,255,.85); text-decoration:none; }
+    .footer a:hover{ text-decoration:underline; }
+
+    /* Rarity colors */
+    .rarity-SSR{ border-color: rgba(255,79,216,.25); }
+    .rarity-SR{ border-color: rgba(0,209,255,.22); }
+    .rarity-R{ border-color: rgba(255,255,255,.14); }
+
+    .dot-SSR{ background: rgba(255,79,216,.95); box-shadow:0 0 18px rgba(255,79,216,.55); }
+    .dot-SR{ background: rgba(0,209,255,.95); box-shadow:0 0 18px rgba(0,209,255,.55); }
+    .dot-R{ background: rgba(234,240,255,.85); box-shadow:0 0 18px rgba(234,240,255,.25); }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brandTitle">
+          <div class="name">OC LAB · 认养商城</div>
+          <div class="sub">挑选形象与性格，认养你的 OC</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="页面导航与快捷操作">
+        <button class="pill active" id="navMarket">商城</button>
+        <button class="pill" id="navMy">我的 OC</button>
+        <button class="btn" id="btnReset">重置筛选</button>
+        <button class="btn btnPrimary" id="btnQuickBuy">随机抽 1 个</button>
+      </nav>
+    </header>
+
+    <section class="header">
+      <div>
+        <h1>认养商城</h1>
+        <p>这里是 OC 形象的「认养卡池」。你可以按风格、稀有度、价格筛选，点开查看详情后认养。此页面为静态演示（本地浏览器可直接运行）。</p>
+      </div>
+
+      <div class="balance" aria-label="用户资源（演示）">
+        <div>
+          <div class="k">余额</div>
+          <div class="v"><span id="balance">320</span> <span class="k">晶体</span></div>
+        </div>
+        <span class="tag">新手折扣 -20%</span>
+      </div>
+    </section>
+
+    <section class="filters" aria-label="筛选区">
+      <div class="field">
+        <label for="q">搜索</label>
+        <input id="q" placeholder="输入名称 / 标签，例如：猫耳 / 侦探 / 温柔" />
+      </div>
+
+      <div class="field">
+        <label for="style">风格</label>
+        <select id="style">
+          <option value="">全部</option>
+          <option value="二次元">二次元</option>
+          <option value="轻科幻">轻科幻</option>
+          <option value="古风">古风</option>
+          <option value="兽人">兽人</option>
+          <option value="都市">都市</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="rarity">稀有度</label>
+        <select id="rarity">
+          <option value="">全部</option>
+          <option value="SSR">SSR</option>
+          <option value="SR">SR</option>
+          <option value="R">R</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sort">排序</label>
+        <select id="sort">
+          <option value="recommend">推荐</option>
+          <option value="priceAsc">价格 ↑</option>
+          <option value="priceDesc">价格 ↓</option>
+          <option value="rarityDesc">稀有度 ↓</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="msg" id="toast"></section>
+
+    <section class="grid" id="grid" aria-label="商品列表"></section>
+
+    <div class="footer">
+      演示页：认养后会把 OC 存到本地浏览器（localStorage），并可在「我的 OC」页读取。<br/>
+      下一步你需要 <a href="javascript:void(0)" id="goMy2">我的 OC 列表页</a> 代码时告诉我。
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalMask" id="mask" role="dialog" aria-modal="true" aria-label="商品详情弹窗">
+    <div class="modal">
+      <div class="modalTop">
+        <div class="modalArt" id="modalArt">
+          <div class="bigAvatar" id="modalAvatar">OC</div>
+        </div>
+        <div class="modalInfo">
+          <h2 id="modalName">—</h2>
+          <div class="small" id="modalDesc">—</div>
+
+          <div class="kv">
+            <div class="k">稀有度</div>
+            <div class="v" id="modalRarity">—</div>
+
+            <div class="k">风格</div>
+            <div class="v" id="modalStyle">—</div>
+
+            <div class="k">标签</div>
+            <div class="v" id="modalTags">—</div>
+
+            <div class="k">价格</div>
+            <div class="v"><span id="modalPrice">—</span> 晶体</div>
+          </div>
+
+          <div class="small">
+            认养后你会在「我的 OC」里看到该角色卡，并可进入后续对话/养成系统。
+          </div>
+        </div>
+      </div>
+
+      <div class="modalBottom">
+        <button class="close" id="btnClose">关闭</button>
+        <div class="actions">
+          <button class="btn" id="btnPreview">预览台词</button>
+          <button class="btn btnPrimary" id="btnAdopt">确认认养</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===================== 数据（演示）=====================
+    const items = [
+      {
+        id: "oc_001",
+        name: "夜航·零",
+        rarity: "SSR",
+        style: "轻科幻",
+        tags: ["冷静","侦探","高智商"],
+        price: 220,
+        desc: "冷静的都市侦探型 OC，擅长推理与信息检索，适合“陪你破案/陪你做决策”的对话风格。",
+        avatarText: "零"
+      },
+      {
+        id: "oc_002",
+        name: "蜜桃·小鹿",
+        rarity: "SR",
+        style: "二次元",
+        tags: ["温柔","治愈","陪伴"],
+        price: 120,
+        desc: "高情绪价值的治愈系 OC，擅长倾听与鼓励，适合日常陪伴与情绪安抚。",
+        avatarText: "鹿"
+      },
+      {
+        id: "oc_003",
+        name: "赤鸢·岚",
+        rarity: "SSR",
+        style: "古风",
+        tags: ["傲娇","剑客","守护"],
+        price: 240,
+        desc: "古风剑客，外冷内热，守护欲强。适合“剧情向+羁绊成长”的玩法。",
+        avatarText: "岚"
+      },
+      {
+        id: "oc_004",
+        name: "棉团·猫耳",
+        rarity: "SR",
+        style: "二次元",
+        tags: ["猫耳","粘人","撒娇"],
+        price: 110,
+        desc: "猫耳系黏人 OC，偏撒娇互动与轻剧情，适合高频短对话。",
+        avatarText: "喵"
+      },
+      {
+        id: "oc_005",
+        name: "银棘·Alpha",
+        rarity: "SSR",
+        style: "兽人",
+        tags: ["强势","护短","热血"],
+        price: 260,
+        desc: "兽人 Alpha 气质强烈，护短且热血，适合“对抗/竞技/冒险”叙事。",
+        avatarText: "A"
+      },
+      {
+        id: "oc_006",
+        name: "雨幕·阿澄",
+        rarity: "R",
+        style: "都市",
+        tags: ["朋友","吐槽","轻松"],
+        price: 60,
+        desc: "像朋友一样的吐槽搭子，轻松日常向，适合低成本陪聊。",
+        avatarText: "澄"
+      },
+      {
+        id: "oc_007",
+        name: "极昼·Lambda",
+        rarity: "SR",
+        style: "轻科幻",
+        tags: ["理性","助手","规划"],
+        price: 140,
+        desc: "偏理性助手型 OC，适合做计划、拆任务、给建议，带一点轻科幻“档案员”设定。",
+        avatarText: "λ"
+      },
+      {
+        id: "oc_008",
+        name: "桃夭·绾绾",
+        rarity: "R",
+        style: "古风",
+        tags: ["俏皮","话痨","八卦"],
+        price: 70,
+        desc: "古风小话痨，嘴甜爱八卦，适合轻松聊天与“剧情旁白”。",
+        avatarText: "绾"
+      },
+      {
+        id: "oc_009",
+        name: "霓虹·Kira",
+        rarity: "SR",
+        style: "都市",
+        tags: ["潮酷","直球","社交"],
+        price: 150,
+        desc: "潮酷直球社交型 OC，适合陪你练口才、写文案、做社交策略。",
+        avatarText: "K"
+      },
+      {
+        id: "oc_010",
+        name: "白噪·Moss",
+        rarity: "R",
+        style: "轻科幻",
+        tags: ["安静","陪读","专注"],
+        price: 80,
+        desc: "陪你专注学习/工作的“白噪”型 OC，低打扰高陪伴。",
+        avatarText: "M"
+      },
+      {
+        id: "oc_011",
+        name: "星砂·Nana",
+        rarity: "SR",
+        style: "二次元",
+        tags: ["元气","萌","打气"],
+        price: 130,
+        desc: "元气打气型 OC，适合日常激励、运动打卡、习惯养成。",
+        avatarText: "娜"
+      },
+      {
+        id: "oc_012",
+        name: "灰域·Rook",
+        rarity: "SSR",
+        style: "都市",
+        tags: ["腹黑","谈判","策略"],
+        price: 250,
+        desc: "谈判与策略向 OC，腹黑但靠谱，适合商业策略/博弈对话。",
+        avatarText: "R"
+      }
+    ];
+
+    const rarityRank = { "SSR": 3, "SR": 2, "R": 1 };
+
+    // ===================== 状态与存储 ======================
+    const $ = (id) => document.getElementById(id);
+    const grid = $("grid");
+    const toast = $("toast");
+    const q = $("q");
+    const styleSel = $("style");
+    const raritySel = $("rarity");
+    const sortSel = $("sort");
+    const balanceEl = $("balance");
+
+    // 演示余额：如果 localStorage 有就用，否则初始化
+    const BAL_KEY = "oclab_balance";
+    const OWN_KEY = "oclab_owned_ocs";
+
+    function getBalance(){
+      const v = Number(localStorage.getItem(BAL_KEY));
+      if(Number.isFinite(v) && v >= 0) return v;
+      localStorage.setItem(BAL_KEY, "320");
+      return 320;
+    }
+    function setBalance(v){
+      localStorage.setItem(BAL_KEY, String(v));
+      balanceEl.textContent = String(v);
+    }
+    function getOwned(){
+      try{
+        const raw = localStorage.getItem(OWN_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch(e){
+        return [];
+      }
+    }
+    function setOwned(arr){
+      localStorage.setItem(OWN_KEY, JSON.stringify(arr));
+    }
+
+    // UI init
+    setBalance(getBalance());
+
+    function showToast(text, type){
+      toast.textContent = text;
+      toast.className = "msg show " + (type || "");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        toast.className = "msg";
+        toast.textContent = "";
+      }, 2200);
+    }
+
+    // ===================== 渲染 ======================
+    function render(){
+      const keyword = q.value.trim().toLowerCase();
+      const style = styleSel.value;
+      const rarity = raritySel.value;
+      const sort = sortSel.value;
+
+      let list = items.slice();
+
+      // filter
+      if(keyword){
+        list = list.filter(it => {
+          const hay = (it.name + " " + it.style + " " + it.rarity + " " + it.tags.join(" ") + " " + it.desc).toLowerCase();
+          return hay.includes(keyword);
+        });
+      }
+      if(style){
+        list = list.filter(it => it.style === style);
+      }
+      if(rarity){
+        list = list.filter(it => it.rarity === rarity);
+      }
+
+      // sort
+      if(sort === "priceAsc"){
+        list.sort((a,b) => a.price - b.price);
+      }else if(sort === "priceDesc"){
+        list.sort((a,b) => b.price - a.price);
+      }else if(sort === "rarityDesc"){
+        list.sort((a,b) => (rarityRank[b.rarity] - rarityRank[a.rarity]) || (b.price - a.price));
+      }else{
+        // recommend: 稀有度优先 + 中间价靠前
+        list.sort((a,b) => (rarityRank[b.rarity] - rarityRank[a.rarity]) || (Math.abs(a.price-140) - Math.abs(b.price-140)));
+      }
+
+      // render cards
+      grid.innerHTML = list.map(it => cardHTML(it)).join("");
+
+      // bind click
+      for(const el of grid.querySelectorAll("[data-id]")){
+        el.addEventListener("click", () => openModal(el.getAttribute("data-id")));
+      }
+    }
+
+    function cardHTML(it){
+      const dotClass = it.rarity === "SSR" ? "dot-SSR" : it.rarity === "SR" ? "dot-SR" : "dot-R";
+      const rarityClass = it.rarity === "SSR" ? "rarity-SSR" : it.rarity === "SR" ? "rarity-SR" : "rarity-R";
+      const tags = it.tags.slice(0,3).map(t => `<span class="t">${escapeHTML(t)}</span>`).join("");
+      return `
+        <article class="card" data-id="${it.id}" title="点击查看详情">
+          <div class="thumb">
+            <div class="badge"><span class="dot ${dotClass}"></span>${it.style}</div>
+            <div class="avatar">${escapeHTML(it.avatarText)}</div>
+          </div>
+          <div class="body">
+            <div class="nameRow">
+              <h3 class="title">${escapeHTML(it.name)}</h3>
+              <span class="rarity ${rarityClass}">${it.rarity}</span>
+            </div>
+            <p class="desc">${escapeHTML(it.desc)}</p>
+            <div class="metaRow">
+              <div class="tags">${tags}</div>
+              <div class="price">
+                <span class="num">${it.price}</span>
+                <span class="unit">晶体</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function escapeHTML(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ===================== Modal + 认养 ======================
+    const mask = $("mask");
+    const btnClose = $("btnClose");
+    const btnAdopt = $("btnAdopt");
+    const btnPreview = $("btnPreview");
+
+    const modalName = $("modalName");
+    const modalDesc = $("modalDesc");
+    const modalRarity = $("modalRarity");
+    const modalStyle = $("modalStyle");
+    const modalTags = $("modalTags");
+    const modalPrice = $("modalPrice");
+    const modalAvatar = $("modalAvatar");
+
+    let current = null;
+
+    function openModal(id){
+      const it = items.find(x => x.id === id);
+      if(!it) return;
+      current = it;
+
+      modalName.textContent = it.name;
+      modalDesc.textContent = it.desc;
+      modalRarity.textContent = it.rarity;
+      modalStyle.textContent = it.style;
+      modalTags.textContent = it.tags.join("、");
+      modalPrice.textContent = it.price;
+      modalAvatar.textContent = it.avatarText;
+
+      // 按是否已拥有刷新按钮
+      const owned = getOwned();
+      const has = owned.some(x => x.id === it.id);
+      btnAdopt.textContent = has ? "已拥有" : "确认认养";
+      btnAdopt.disabled = has;
+
+      mask.classList.add("show");
+    }
+
+    function closeModal(){
+      mask.classList.remove("show");
+      current = null;
+    }
+
+    btnClose.addEventListener("click", closeModal);
+    mask.addEventListener("click", (e) => {
+      if(e.target === mask) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeModal();
+    });
+
+    btnPreview.addEventListener("click", () => {
+      if(!current) return;
+      const lines = {
+        "SSR": [
+          "“把线索给我，剩下的交给推理。”",
+          "“你不需要完美，只需要继续前进。”",
+          "“我们谈判，不靠情绪，靠筹码。”"
+        ],
+        "SR": [
+          "“我在呢，慢慢说。”",
+          "“今天也要给自己一点奖励！”",
+          "“我可以帮你把计划拆成 3 步。”"
+        ],
+        "R": [
+          "“要不我先吐槽两句？”",
+          "“别急，先喝口水。”",
+          "“我陪你一起专注 25 分钟。”"
+        ]
+      };
+      const pick = lines[current.rarity][Math.floor(Math.random()*3)];
+      showToast(`预览：${pick}`, "ok");
+    });
+
+    btnAdopt.addEventListener("click", () => {
+      if(!current) return;
+
+      const bal = getBalance();
+      if(bal < current.price){
+        showToast("余额不足：晶体不够，先去充值（演示未实现）。", "error");
+        return;
+      }
+
+      const owned = getOwned();
+      if(owned.some(x => x.id === current.id)){
+        showToast("你已拥有该 OC。", "ok");
+        btnAdopt.disabled = true;
+        btnAdopt.textContent = "已拥有";
+        return;
+      }
+
+      // 扣费 + 写入拥有列表
+      const nextBal = bal - current.price;
+      setBalance(nextBal);
+
+      const now = new Date();
+      owned.push({
+        id: current.id,
+        name: current.name,
+        rarity: current.rarity,
+        style: current.style,
+        tags: current.tags,
+        avatarText: current.avatarText,
+        adoptedAt: now.toISOString()
+      });
+      setOwned(owned);
+
+      showToast(`认养成功：${current.name}（-${current.price} 晶体）`, "ok");
+      btnAdopt.disabled = true;
+      btnAdopt.textContent = "已拥有";
+    });
+
+    // ===================== 顶部导航与工具 ======================
+    $("navMy").addEventListener("click", () => {
+      showToast("下一步：需要我的 OC 列表页（my-ocs.html）代码时告诉我。", "ok");
+      // 你后续可改成：window.location.href = './my-ocs.html';
+    });
+
+    $("goMy2").addEventListener("click", () => {
+      showToast("我可以马上给你 my-ocs.html 代码（读取已认养的 OC）。", "ok");
+    });
+
+    $("btnReset").addEventListener("click", () => {
+      q.value = "";
+      styleSel.value = "";
+      raritySel.value = "";
+      sortSel.value = "recommend";
+      render();
+      showToast("已重置筛选。", "ok");
+    });
+
+    $("btnQuickBuy").addEventListener("click", () => {
+      // 从未拥有的里面随机挑
+      const owned = getOwned();
+      const ownedSet = new Set(owned.map(x => x.id));
+      const pool = items.filter(x => !ownedSet.has(x.id));
+      if(pool.length === 0){
+        showToast("你已经拥有全部 OC（演示数据）。", "ok");
+        return;
+      }
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      openModal(pick.id);
+    });
+
+    // ===================== 过滤绑定 ======================
+    q.addEventListener("input", () => render());
+    styleSel.addEventListener("change", () => render());
+    raritySel.addEventListener("change", () => render());
+    sortSel.addEventListener("change", () => render());
+
+    // init
+    render();
+  </script>
+</body>
+</html>
