@@ -1,329 +1,121 @@
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 对话测试</title>
-    <title>星野琉璃 | 2145</title>
-<style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background: #1a1a2e; 
-            color: #eee;
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background: #0a0a0f;
-            color: #fff;
-height: 100vh;
-            overflow: hidden;
-display: flex;
-            flex-direction: column;
-        }
-        .header { 
-            padding: 15px; 
-            background: #16213e;
-            text-align: center;
-            border-bottom: 2px solid #e94560;
-            justify-content: center;
-            align-items: center;
+align-items: center;
 }
-        .chat-container { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        
+
         /* 手机外框 */
-        .phone-frame {
+.phone-frame {
 width: 100%;
-            max-width: 414px;
-            height: 100vh;
-            max-height: 896px;
-            background: #1a1a24;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(233, 69, 96, 0.3);
-        }
-        
-        @media (min-width: 415px) {
-            .phone-frame {
-                height: 90vh;
-                border-radius: 40px;
-                border: 8px solid #2a2a35;
-            }
-        }
-        
+max-width: 414px;
+@@ -44,7 +43,6 @@
+}
+}
+
         /* 状态栏 */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            font-size: 14px;
-            font-weight: 500;
-}
-        .message { 
-            margin-bottom: 15px; 
-        
-        .status-left {
+.status-bar {
 display: flex;
-            align-items: flex-start;
-            align-items: center;
-            gap: 8px;
+justify-content: space-between;
+@@ -95,7 +93,6 @@
+text-transform: uppercase;
 }
-        .message.user { flex-direction: row-reverse; }
-        .avatar { 
-            width: 40px; 
-            height: 40px; 
-        
-        .rec-dot {
-            width: 8px;
-            height: 8px;
-            background: #e94560;
-border-radius: 50%;
-            margin: 0 10px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .status-right {
-            text-align: right;
-        }
-        
-        .time {
-            font-size: 24px;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-        
-        .date {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-        }
-        
+
         /* 左侧图标栏 */
-        .side-icons {
-            position: absolute;
-            left: 15px;
-            top: 80px;
+.side-icons {
+position: absolute;
+left: 15px;
+@@ -128,7 +125,6 @@
+transform: scale(1.05);
+}
+
+        /* 未读消息红点 */
+.icon-btn .badge {
+position: absolute;
+top: -5px;
+@@ -138,25 +134,22 @@
+background: #e94560;
+border-radius: 50%;
+font-size: 10px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 50;
-        }
-        
-        .icon-btn {
-            width: 44px;
-            height: 44px;
-            background: rgba(233, 69, 96, 0.15);
-            border: 1px solid rgba(233, 69, 96, 0.3);
-            border-radius: 12px;
-display: flex;
+            display: none;
 align-items: center;
 justify-content: center;
-font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .icon-btn:hover, .icon-btn.active {
-            background: rgba(233, 69, 96, 0.4);
-            border-color: #e94560;
-            transform: scale(1.05);
-        }
-        
-        /* 主内容区 */
-        .main-content {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            display: none;
 }
-        .oc-avatar { background: #e94560; }
-        .user-avatar { background: #0f3460; }
-        .bubble { 
-            max-width: 70%; 
-            padding: 12px 16px;
-            border-radius: 18px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-        .oc .bubble { 
-            background: #16213e; 
-            border: 1px solid #e94560;
-        }
-        .user .bubble { 
-            background: #0f3460; 
-        }
-        .input-area { 
-            padding: 20px; 
-            background: #16213e;
-        
-        /* 角色展示区 */
-        .character-display {
-            flex: 1;
+
+.icon-btn .badge.show {
 display: flex;
-            gap: 10px;
-            max-width: 800px;
-            margin: 0 auto;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 20px 20px;
-            position: relative;
-        }
-        
-        /* 背景装饰 */
-        .bg-decoration {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0.1;
-            background: 
-                radial-gradient(circle at 20% 80%, #e94560 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, #16213e 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        /* 角色立绘容器 */
-        .character-frame {
-            width: 280px;
-            height: 380px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            border: 2px solid rgba(233, 69, 96, 0.3);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        
-        /* 角色占位（可用图片替换） */
-        .character-image {
-width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 120px;
-            background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%);
-            position: relative;
 }
-        input { 
-            flex: 1; 
-            padding: 12px;
-            border: none;
-        
-        .character-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, transparent 60%, rgba(233, 69, 96, 0.1) 100%);
-        }
-        
+
+        /* 主内容区 */
+.main-content {
+height: 100%;
+display: flex;
+flex-direction: column;
+position: relative;
+}
+
+        /* 背景装饰 */
+.bg-decoration {
+position: absolute;
+top: 0;
+@@ -170,7 +163,6 @@
+pointer-events: none;
+}
+
+        /* 角色展示区 */
+.character-display {
+flex: 1;
+display: flex;
+@@ -181,7 +173,6 @@
+position: relative;
+}
+
+        /* 角色立绘容器 */
+.character-frame {
+width: 280px;
+height: 380px;
+@@ -193,7 +184,6 @@
+box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+        /* 角色占位（可用图片替换） */
+.character-image {
+width: 100%;
+height: 100%;
+@@ -215,7 +205,6 @@
+background: linear-gradient(180deg, transparent 60%, rgba(233, 69, 96, 0.1) 100%);
+}
+
         /* 角色信息 */
-        .character-info {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .character-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e94560;
-            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
-            letter-spacing: 4px;
-        }
-        
-        .character-title {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-            letter-spacing: 2px;
-        }
-        
+.character-info {
+text-align: center;
+margin-top: 20px;
+@@ -236,14 +225,12 @@
+letter-spacing: 2px;
+}
+
         /* 对话区域 */
-        .chat-section {
-            background: linear-gradient(180deg, transparent 0%, rgba(26,26,36,0.95) 20%);
-            padding: 20px;
-            position: relative;
-        }
-        
+.chat-section {
+background: linear-gradient(180deg, transparent 0%, rgba(26,26,36,0.95) 20%);
+padding: 20px;
+position: relative;
+}
+
         /* 对话气泡 */
-        .dialogue-box {
-            background: rgba(22, 33, 62, 0.9);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 15px;
-            min-height: 60px;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-        
-        .dialogue-box::before {
-            content: '...';
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            color: #e94560;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .dialogue-text {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #eee;
-        }
-        
-        .dialogue-text.typing::after {
-            content: '|';
-            animation: blink 1s infinite;
-            color: #e94560;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
+.dialogue-box {
+background: rgba(22, 33, 62, 0.9);
+border: 1px solid rgba(233, 69, 96, 0.2);
+@@ -282,7 +269,6 @@
+50% { opacity: 0; }
+}
+
         /* 输入区域（音乐播放器风格） */
-        .input-section {
-            background: rgba(15, 15, 26, 0.95);
-            border-top: 1px solid rgba(233, 69, 96, 0.2);
-            padding: 20px;
-        }
-        
-        .player-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+.input-section {
+background: rgba(15, 15, 26, 0.95);
+border-top: 1px solid rgba(233, 69, 96, 0.2);
+@@ -293,4 +279,19 @@
+background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 border-radius: 20px;
-            background: #0f3460;
-            padding: 15px;
+padding: 15px;
+            border: 1px solid rgba
             border: 1px solid rgba(233, 69, 96, 0.2);
         }
         
@@ -339,336 +131,4 @@ border-radius: 20px;
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        
-        .input-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .input-field {
-            flex: 1;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            border-radius: 25px;
-            padding: 12px 20px;
-color: #fff;
-            font-size: 16px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        
-        .input-field:focus {
-            border-color: #e94560;
-            box-shadow: 0 0 10px rgba(233, 69, 96, 0.2);
-        }
-        
-        .input-field::placeholder {
-            color: #666;
-}
-        button { 
-            padding: 12px 24px;
-        
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
-border: none;
-            border-radius: 20px;
-            background: #e94560;
-            border-radius: 50%;
-color: #fff;
-            font-size: 20px;
-cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        }
-        
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
-        }
-        
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* 底部装饰线 */
-        .bottom-line {
-            height: 5px;
-            background: linear-gradient(90deg, transparent, #e94560, transparent);
-            margin-top: 10px;
-            opacity: 0.5;
-        }
-        
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(233, 69, 96, 0.3);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(233, 69, 96, 0.5);
-}
-        button:disabled { opacity: 0.6; }
-        .typing { color: #888; font-style: italic; }
-</style>
-</head>
-<body>
-    <div class="header">
-        <h2>🌟 星野琉璃 | 赛博朋克少女</h2>
-        <p>EMILY的电子宠物</p>
-        <small>2145年新东京 · 测试版</small>
-    </div>
-    
-    <div class="chat-container" id="chat"></div>
-    
-    <div class="input-area">
-        <input type="text" id="input" placeholder="输入消息..." onKeyPress="if(event.key==='Enter')send()">
-        <button onClick="send()" id="btn">发送</button>
-    <div class="phone-frame">
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <div class="status-left">
-                <div class="rec-dot"></div>
-                <span>REC</span>
-            </div>
-            <div class="status-right">
-                <div class="time" id="clock">09:04</div>
-                <div class="date">WEDNESDAY</div>
-            </div>
-        </div>
-        
-        <!-- 左侧图标栏 -->
-        <div class="side-icons">
-            <div class="icon-btn active" title="对话">💬</div>
-            <div class="icon-btn" title="档案">📋</div>
-            <div class="icon-btn" title="音乐">🎵</div>
-            <div class="icon-btn" title="设置">⚙️</div>
-        </div>
-        
-        <!-- 主内容 -->
-        <div class="main-content">
-            <div class="bg-decoration"></div>
-            
-            <!-- 角色展示 -->
-            <div class="character-display">
-                <div class="character-frame">
-                    <div class="character-image">
-                        🤖
-                    </div>
-                </div>
-                <div class="character-info">
-                    <div class="character-name">星野琉璃</div>
-                    <div class="character-title">2145 · 新东京 · 赛博朋克少女</div>
-                </div>
-            </div>
-            
-            <!-- 对话区域 -->
-            <div class="chat-section">
-                <div class="dialogue-box" id="dialogueBox">
-                    <div class="dialogue-text" id="dialogueText">
-                        ...你是谁？怎么突然出现在我的频道里。
-                    </div>
-                </div>
-                
-                <!-- 输入区域（播放器风格） -->
-                <div class="input-section">
-                    <div class="player-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressBar"></div>
-                        </div>
-                        <div class="input-controls">
-                            <input 
-                                type="text" 
-                                class="input-field" 
-                                id="inputField"
-                                placeholder="输入消息..." 
-                                onkeypress="if(event.key==='Enter')sendMessage()"
-                            >
-                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                                ▶
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bottom-line"></div>
-                </div>
-            </div>
-        </div>
-</div>
-
-<script>
-        // === 修复：删除 URL 末尾空格 ===
-        // API 配置
-const API_URL = 'https://oc-chat-test.vercel.app/api/chat';
-
-        // 状态
-let history = [];
-        let isTyping = false;
-
-        // 开场白
-        addMessage('oc', '...你是谁？怎么突然出现在我的频道里。');
-        // 时钟更新
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        function addMessage(role, text) {
-            const chat = document.getElementById('chat');
-            const div = document.createElement('div');
-            div.className = `message ${role}`;
-            div.innerHTML = `
-                <div class="avatar ${role}-avatar">${role === 'oc' ? '🤖' : '👤'}</div>
-                <div class="bubble">${text}</div>
-            `;
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        // 添加消息到对话框
-        function showMessage(text, isUser = false) {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.textContent = text;
-            dialogueText.classList.remove('typing');
-            
-            // 添加动画效果
-            dialogueText.style.opacity = '0';
-            setTimeout(() => {
-                dialogueText.style.transition = 'opacity 0.3s ease';
-                dialogueText.style.opacity = '1';
-            }, 50);
-        }
-        
-        // 显示输入中
-        function showTyping() {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.textContent = '...';
-            dialogueText.classList.add('typing');
-}
-
-        async function send() {
-            const input = document.getElementById('input');
-            const btn = document.getElementById('btn');
-        // 更新进度条
-        function setProgress(percent) {
-            document.getElementById('progressBar').style.width = percent + '%';
-        }
-        
-        // 发送消息
-        async function sendMessage() {
-            const input = document.getElementById('inputField');
-            const btn = document.getElementById('sendBtn');
-const text = input.value.trim();
-            if (!text) return;
-
-            addMessage('user', text);
-            if (!text || isTyping) return;
-            
-            // 显示用户消息
-            showMessage(text, true);
-input.value = '';
-btn.disabled = true;
-            isTyping = true;
-            setProgress(30);
-
-            // 显示"输入中"
-            const typing = document.createElement('div');
-            typing.className = 'message oc typing';
-            typing.innerHTML = '<div class="avatar oc-avatar">🤖</div><div class="bubble">...</div>';
-            document.getElementById('chat').appendChild(typing);
-            // 延迟显示输入中
-            setTimeout(() => {
-                showTyping();
-                setProgress(60);
-            }, 300);
-
-try {
-const res = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, history })
-                    body: JSON.stringify({ 
-                        message: text, 
-                        history 
-                    })
-});
-
-                setProgress(80);
-const data = await res.json();
-                typing.remove();
-                setProgress(100);
-
-if (data.reply) {
-                    addMessage('oc', data.reply);
-                    // 模拟打字效果
-                    await typeWriter(data.reply);
-                    
-                    // 更新历史
-history.push(
-{ role: 'user', content: text },
-{ role: 'assistant', content: data.reply }
-);
-                    
-// 只保留最近20轮
-                    if (history.length > 40) history = history.slice(-40);
-                    if (history.length > 40) {
-                        history = history.slice(-40);
-                    }
-} else {
-                    addMessage('oc', '（连接中断：' + (data.error || '未知错误') + '）');
-                    showMessage('...连接中断。');
-}
-} catch (err) {
-                typing.remove();
-                addMessage('oc', '（错误：' + err.message + '）');
-                showMessage('...错误：' + err.message);
-}
-            
-            isTyping = false;
-btn.disabled = false;
-            setTimeout(() => setProgress(0), 500);
-        }
-        
-        // 打字机效果
-        async function typeWriter(text) {
-            const dialogueText = document.getElementById('dialogueText');
-            dialogueText.classList.remove('typing');
-            dialogueText.textContent = '';
-            
-            for (let i = 0; i < text.length; i++) {
-                dialogueText.textContent += text[i];
-                await new Promise(r => setTimeout(r, 30));
-            }
-}
-        
-        // 开场白动画
-        window.onload = () => {
-            const opening = "...你是谁？怎么突然出现在我的频道里。";
-            document.getElementById('dialogueText').textContent = '';
-            setTimeout(() => typeWriter(opening), 500);
-        };
-</script>
-</body>
-</html>
+            background: linear-gradient(90deg, #e94560, #ff
